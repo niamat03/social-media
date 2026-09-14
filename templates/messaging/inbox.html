@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% load account_extras %}
+{% block title %}Messages · Nearby{% endblock %}
+{% block content %}
+<h2>Messages</h2>
+<div class="card">
+  {% for row in rows %}
+    <a href="{% url 'messaging:conversation' row.other.username %}" class="user-row" style="text-decoration:none; {% if row.unread %}font-weight:600;{% endif %}">
+      <span class="avatar">
+        <img src="{{ row.other|avatar_url }}" class="avatar" alt="">
+      </span>
+      <div class="user-row-info">
+        <span class="display-name">{{ row.other.get_display_name }}</span>
+        <div class="username">
+          {% if row.last %}{{ row.last.content|truncatechars:50 }}{% else %}Say hello{% endif %}
+        </div>
+      </div>
+      {% if row.unread %}<span class="nav-badge">•</span>{% endif %}
+    </a>
+  {% empty %}
+    <div class="empty-state">
+      <p>No conversations yet.</p>
+      <p><a class="link-accent" href="{% url 'social:explore' %}">Find people to message</a></p>
+    </div>
+  {% endfor %}
+</div>
+{% endblock %}

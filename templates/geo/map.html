@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Map · Nearby{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.Default.css">
+{% endblock %}
+{% block content %}
+<h2>Explore near you</h2>
+<div class="map-toolbar">
+  <div class="location-search">
+    <input type="text" id="location-search-input" placeholder="Search a city or place…" autocomplete="off">
+    <button type="button" id="location-search-btn" class="btn btn-sm" aria-label="Search location">
+      <svg class="icon icon-sm" aria-hidden="true"><use href="#icon-search"></use></svg>
+    </button>
+    <div id="location-search-results" class="location-search-results" hidden></div>
+  </div>
+  <button id="locate-btn" class="btn btn-primary">
+    <svg class="icon icon-sm" aria-hidden="true"><use href="#icon-locate"></use></svg> Use my location
+  </button>
+  <label>Radius:
+    <select id="radius-select">
+      <option value="5" selected>5 km</option>
+      <option value="10">10 km</option>
+      <option value="25">25 km</option>
+      <option value="50">50 km</option>
+    </select>
+  </label>
+  <span id="map-status" style="color:var(--text-muted); font-size:0.9rem;">Click the map or use your location to search for posts nearby.</span>
+</div>
+<div id="map"></div>
+{% endblock %}
+{% block extra_scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.js"></script>
+<script src="{% static 'js/map.js' %}?v=4"></script>
+{% endblock %}

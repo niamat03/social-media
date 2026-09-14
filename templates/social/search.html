@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}Search · Nearby{% endblock %}
+{% block content %}
+<h2>Search results for "{{ query }}"</h2>
+
+<div class="card">
+  <h3 style="margin-top:0;">People</h3>
+  {% for user in users %}
+    {% include 'social/partials/user_row.html' %}
+  {% empty %}
+    <p style="color:var(--text-muted)">No matching users.</p>
+  {% endfor %}
+</div>
+
+<div class="card" style="margin-top:16px;">
+  <h3 style="margin-top:0;">Posts</h3>
+  {% for post in posts %}
+    {% include 'posts/partials/post_card.html' %}
+  {% empty %}
+    <div class="empty-state"><p>No matching posts.</p></div>
+  {% endfor %}
+</div>
+{% endblock %}

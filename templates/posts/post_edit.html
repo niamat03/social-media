@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block title %}Edit post · Nearby{% endblock %}
+{% block content %}
+<div class="card composer">
+  <h2 style="margin-top:0;">Edit post</h2>
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.content }}
+    {{ form.latitude }}
+    {{ form.longitude }}
+    {% if form.content.errors %}<ul class="errorlist">{% for e in form.content.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+    {% if form.image.errors %}<ul class="errorlist">{% for e in form.image.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+    {% if form.non_field_errors %}<ul class="errorlist">{% for e in form.non_field_errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+
+    {% if post.image %}
+      <img src="{{ post.image.url }}" class="post-image" alt="" style="max-height:220px;">
+    {% endif %}
+
+    <div class="composer-footer">
+      <div class="composer-actions">
+        <div class="file-input-wrapper">
+          <label for="{{ form.image.id_for_label }}" class="icon-btn" title="Change photo">
+            <svg class="icon" aria-hidden="true"><use href="#icon-image"></use></svg> Photo
+          </label>
+          {{ form.image }}
+        </div>
+        <span class="file-name" data-file-name></span>
+        <button type="button" class="add-location-btn icon-btn">
+          <svg class="icon" aria-hidden="true"><use href="#icon-map-pin"></use></svg> Location
+        </button>
+        {{ form.location_name }}
+      </div>
+      <button type="submit" class="btn btn-primary">Save</button>
+    </div>
+
+    {% if post.location %}
+      <label style="display:flex; align-items:center; gap:8px; margin-top:12px; font-size:0.9rem; color:var(--text-muted);">
+        {{ form.remove_location }} Remove current location ({{ post.location_name }}{% if post.location_name and post.city %}, {% endif %}{{ post.city }})
+      </label>
+    {% endif %}
+
+    <div class="location-status" style="font-size:0.8rem;color:var(--text-muted);margin-top:6px;"></div>
+  </form>
+  <a class="link-accent" style="display:inline-block; margin-top:12px;" href="{% url 'posts:detail' post.id %}">Cancel</a>
+</div>
+{% endblock %}

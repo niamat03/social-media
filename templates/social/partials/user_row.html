@@ -1,0 +1,21 @@
+{% load account_extras %}
+<div class="user-row">
+  <a href="{% url 'accounts:profile' user.username %}" class="avatar">
+    <img src="{{ user|avatar_url }}" class="avatar" alt="">
+  </a>
+  <div class="user-row-info">
+    <a href="{% url 'accounts:profile' user.username %}" class="display-name">{{ user.get_display_name }}</a>
+    <div class="username">@{{ user.username }}</div>
+  </div>
+  {% if request.user.is_authenticated and user != request.user %}
+    <button
+      class="follow-btn follow-icon-btn {% if user.is_following %}following{% endif %}"
+      data-username="{{ user.username }}"
+      data-icon-only="true"
+      title="{% if user.is_following %}Unfollow{% else %}Follow{% endif %}"
+      aria-label="{% if user.is_following %}Unfollow{% else %}Follow{% endif %} {{ user.username }}"
+    >
+      <svg class="icon icon-sm" aria-hidden="true"><use href="#{% if user.is_following %}icon-check{% else %}icon-plus{% endif %}"></use></svg>
+    </button>
+  {% endif %}
+</div>

@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% load account_extras %}
+{% block title %}{{ profile_user.get_display_name }} · Nearby{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="profile-header">
+    <img src="{{ profile_user|avatar_url }}" class="avatar avatar-lg" alt="">
+    <div>
+      <h2 style="margin:0;">{{ profile_user.get_display_name }}</h2>
+      <div style="color:var(--text-muted)">@{{ profile_user.username }}</div>
+      {% if profile_user.bio %}<p style="margin:8px 0;">{{ profile_user.bio }}</p>{% endif %}
+      <div class="profile-stats">
+        <span><strong>{{ posts_count }}</strong> posts</span>
+        <a href="{% url 'accounts:followers' profile_user.username %}"><strong data-followers-count>{{ followers_count }}</strong> followers</a>
+        <a href="{% url 'accounts:following' profile_user.username %}"><strong>{{ following_count }}</strong> following</a>
+      </div>
+      {% if is_own_profile %}
+        <a href="{% url 'accounts:edit_profile' %}" class="btn btn-sm">Edit profile</a>
+        <a href="{% url 'posts:saved' %}" class="btn btn-sm">
+          <svg class="icon icon-sm" aria-hidden="true"><use href="#icon-bookmark"></use></svg> Saved posts
+        </a>
+      {% elif request.user.is_authenticated %}
+        <button class="follow-btn btn btn-sm {% if not is_following %}btn-primary{% endif %}" data-username="{{ profile_user.username }}">
+          {% if is_following %}Following{% else %}Follow{% endif %}
+        </button>
+        <a href="{% url 'messaging:conversation' profile_user.username %}" class="btn btn-sm">
+          <svg class="icon icon-sm" aria-hidden="true"><use href="#icon-mail"></use></svg> Message
+        </a>
+        <button class="btn btn-sm btn-danger block-toggle-btn" data-username="{{ profile_user.username }}">
+          <svg class="icon icon-sm" aria-hidden="true"><use href="#icon-block"></use></svg>
+          <span class="block-toggle-label">{% if is_blocked %}Unblock{% else %}Block{% endif %}</span>
+        </button>
+      {% endif %}
+    </div>
+  </div>
+
+  {% for post in posts %}
+    {% include 'posts/partials/post_card.html' %}
+  {% empty %}
+    <div class="empty-state"><p>No posts yet.</p></div>
+  {% endfor %}
+</div>
+{% endblock %}

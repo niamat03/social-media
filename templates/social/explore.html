@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}Explore · Nearby{% endblock %}
+{% block content %}
+<h2>Explore</h2>
+<div class="card">
+  <h3 style="margin-top:0;">Trending this week</h3>
+  {% for post in trending_posts %}
+    {% include 'posts/partials/post_card.html' %}
+  {% empty %}
+    <div class="empty-state"><p>Nothing trending yet.</p></div>
+  {% endfor %}
+</div>
+{% endblock %}
+
+{% block sidebar %}
+<div class="card">
+  <h3>People to follow</h3>
+  {% for user in popular_users %}
+    {% include 'social/partials/user_row.html' %}
+  {% empty %}
+    <p style="color:var(--text-muted)">No users yet.</p>
+  {% endfor %}
+</div>
+{% endblock %}

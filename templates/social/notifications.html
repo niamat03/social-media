@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% load account_extras %}
+{% block title %}Notifications · Nearby{% endblock %}
+{% block content %}
+<h2>Notifications</h2>
+<div class="card" id="notifications-list">
+  {% for n in notifications %}
+    <div class="notification-item {% if not n.is_read %}unread{% endif %}">
+      <a href="{% url 'accounts:profile' n.actor.username %}" class="avatar">
+        <img src="{{ n.actor|avatar_url }}" class="avatar" alt="">
+      </a>
+      <div class="notification-body">
+        <a href="{% url 'accounts:profile' n.actor.username %}" style="font-weight:600; color:var(--text);">{{ n.actor.get_display_name }}</a>
+        {{ n.get_verb_display }}
+        {% if n.post %}<a class="link-accent" href="{% url 'posts:detail' n.post.id %}">view post</a>{% endif %}
+        <div class="comment-time">{{ n.created_at|timesince }} ago</div>
+      </div>
+    </div>
+  {% empty %}
+    <div class="empty-state"><p>No notifications yet.</p></div>
+  {% endfor %}
+</div>
+{% endblock %}

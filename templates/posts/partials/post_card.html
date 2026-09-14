@@ -1,0 +1,95 @@
+{% load post_extras %}
+<article class="post-card" id="post-{{ post.id }}" data-author-username="{{ post.author.username }}">
+  <a href="{% url 'accounts:profile' post.author.username %}" class="avatar">
+    <img src="{{ post.author|avatar_url }}" class="avatar" alt="">
+  </a>
+  <div class="post-body">
+    <div class="post-meta">
+      <a class="name" href="{% url 'accounts:profile' post.author.username %}">{{ post.author.get_display_name }}</a>
+      <span>@{{ post.author.username }}</span>
+      <span>·</span>
+      <a href="{% url 'posts:detail' post.id %}" style="color:inherit">{{ post.created_at|timesince }} ago</a>
+
+      <div class="post-menu">
+        <button type="button" class="action-btn post-menu-toggle" data-post-id="{{ post.id }}" aria-label="Post options" aria-haspopup="true" aria-expanded="false">
+          <svg class="icon icon-sm" aria-hidden="true"><use href="#icon-more"></use></svg>
+        </button>
+        <div class="post-menu-dropdown" hidden>
+          {% if request.user == post.author %}
+            <a href="{% url 'posts:edit' post.id %}" class="post-menu-item">
+              <svg class="icon icon-sm" aria-hidden="true"><use href="#icon-edit"></use></svg> Edit post
+            </a>
+            <form method="post" action="{% url 'posts:delete' post.id %}" onsubmit="return confirm('Delete this post?');">
+              {% csrf_token %}
+              <button type="submit" class="post-menu-item post-menu-danger">
+                <svg class="icon icon-sm" aria-hidden="true"><use href="#icon-trash"></use></svg> Delete post
+              </button>
+            </form>
+          {% elif request.user.is_authenticated %}
+            <button type="button" class="post-menu-item report-open-btn" data-post-id="{{ post.id }}">
+              <svg class="icon icon-sm" aria-hidden="true"><use href="#icon-flag"></use></svg> Report post
+            </button>
+            <button
+              type="button"
+              class="post-menu-item post-menu-danger block-toggle-btn"
+              data-username="{{ post.author.username }}"
+            >
+              <svg class="icon icon-sm" aria-hidden="true"><use href="#icon-block"></use></svg>
+              <span class="block-toggle-label">{% if post.author_is_blocked %}Unblock{% else %}Block{% endif %} @{{ post.author.username }}</span>
+            </button>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    {% if post.location_name or post.city %}
+      <div class="post-location">
+        <svg class="icon icon-sm" aria-hidden="true"><use href="#icon-map-pin"></use></svg>
+        {{ post.location_name }}{% if post.location_name and post.city %}, {% endif %}{{ post.city }}
+      </div>
+    {% endif %}
+    <div class="post-content">{{ post.content|linkify }}</div>
+    {% if post.image %}<img class="post-image" src="{{ post.image.url }}" alt="">{% endif %}
+
+    {% if request.user.is_authenticated and request.user != post.author %}
+      <form class="report-form" data-post-id="{{ post.id }}" hidden>
+        <select name="reason" required>
+          <option value="" disabled selected>Reason…</option>
+          <option value="spam">Spam</option>
+          <option value="harassment">Harassment or bullying</option>
+          <option value="inappropriate">Inappropriate content</option>
+          <option value="other">Other</option>
+        </select>
+        <textarea name="details" placeholder="Optional details (max 500 chars)" maxlength="500"></textarea>
+        <div style="display:flex; gap:8px; justify-content:flex-end;">
+          <button type="button" class="btn btn-sm report-cancel-btn">Cancel</button>
+          <button type="submit" class="btn btn-sm btn-primary">Submit report</button>
+        </div>
+      </form>
+    {% endif %}
+
+    <div class="post-actions">
+      <button
+        class="action-btn like-btn {% if post.liked_by_user %}liked{% endif %}"
+        data-post-id="{{ post.id }}"
+        aria-pressed="{% if post.liked_by_user %}true{% else %}false{% endif %}"
+        aria-label="{% if post.liked_by_user %}Unlike this post{% else %}Like this post{% endif %}"
+      >
+        <svg class="icon icon-heart" aria-hidden="true"><use href="#icon-heart"></use></svg> <span class="like-count">{{ post.like_count }}</span>
+      </button>
+      <a class="action-btn" href="{% url 'posts:detail' post.id %}" aria-label="View comments ({{ post.comment_count }})">
+        <svg class="icon" aria-hidden="true"><use href="#icon-message-circle"></use></svg> <span data-comment-count="{{ post.id }}">{{ post.comment_count }}</span>
+      </a>
+      {% if request.user.is_authenticated %}
+        <button
+          class="action-btn save-btn {% if post.saved_by_user %}saved{% endif %}"
+          data-post-id="{{ post.id }}"
+          aria-pressed="{% if post.saved_by_user %}true{% else %}false{% endif %}"
+          aria-label="{% if post.saved_by_user %}Remove from saved{% else %}Save this post{% endif %}"
+        >
+          <svg class="icon icon-bookmark" aria-hidden="true"><use href="#icon-bookmark"></use></svg>
+        </button>
+      {% endif %}
+    </div>
+  </div>
+</article>

@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}Log in · Nearby{% endblock %}
+{% block content %}
+<div class="auth-shell">
+  <div class="card auth-card">
+    <h1>Log in</h1>
+    <form method="post">
+      {% csrf_token %}
+      <div class="field">
+        <label for="id_username">Username</label>
+        {{ form.username }}
+      </div>
+      <div class="field">
+        <label for="id_password">Password</label>
+        {{ form.password }}
+      </div>
+      {% if form.non_field_errors %}<ul class="errorlist">{% for e in form.non_field_errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+      <button type="submit" class="btn btn-primary" style="width:100%">Log in</button>
+    </form>
+    <p style="text-align:center; margin-top:14px;">No account? <a class="link-accent" href="{% url 'accounts:register' %}">Sign up</a></p>
+  </div>
+</div>
+{% endblock %}

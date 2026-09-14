@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block title %}Post by {{ post.author.username }} · Nearby{% endblock %}
+{% block content %}
+<div class="card">
+  {% include 'posts/partials/post_card.html' %}
+</div>
+
+<div class="card" style="margin-top:16px;">
+  <h3 style="margin-top:0;">Comments</h3>
+  {% if request.user.is_authenticated %}
+    <form class="comment-form" data-post-id="{{ post.id }}">
+      <input type="text" name="content" placeholder="Add a comment..." maxlength="500" required>
+      <button type="submit" class="btn btn-sm btn-primary">Send</button>
+    </form>
+  {% endif %}
+
+  {% if comments_page.has_previous %}
+    <div style="text-align:center; margin-top:12px;">
+      <a class="btn btn-sm" href="?comment_page={{ comments_page.previous_page_number }}">Load earlier comments</a>
+    </div>
+  {% endif %}
+
+  <div class="comment-list" data-post-id="{{ post.id }}">
+    {% for comment in comments_page %}
+      <div class="comment" data-comment-id="{{ comment.id }}">
+        <span class="name">{{ comment.author.get_display_name }}</span>
+        <span class="comment-time">{{ comment.created_at|timesince }} ago</span>
+        {% if comment.author == request.user %}
+          <div class="comment-actions">
+            <button type="button" class="comment-edit-btn" data-comment-id="{{ comment.id }}">Edit</button>
+            <button type="button" class="comment-delete" data-comment-id="{{ comment.id }}" data-post-id="{{ post.id }}">Delete</button>
+          </div>
+        {% endif %}
+        <p class="comment-content">{{ comment.content }}</p>
+      </div>
+    {% empty %}
+      <p style="color:var(--text-muted)">No comments yet.</p>
+    {% endfor %}
+  </div>
+
+  {% if comments_page.has_next %}
+    <div style="text-align:center; margin-top:12px;">
+      <a class="btn btn-sm" href="?comment_page={{ comments_page.next_page_number }}">Show more comments</a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

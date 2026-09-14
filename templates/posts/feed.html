@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% block title %}Home · Nearby{% endblock %}
+{% block content %}
+<div class="card composer">
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.content }}
+    {{ form.latitude }}
+    {{ form.longitude }}
+    {% if form.non_field_errors %}<ul class="errorlist">{% for e in form.non_field_errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+    <div class="composer-footer">
+      <div class="composer-actions">
+        <div class="file-input-wrapper">
+          <label for="{{ form.image.id_for_label }}" class="icon-btn" title="Add photo">
+            <svg class="icon" aria-hidden="true"><use href="#icon-image"></use></svg> Photo
+          </label>
+          {{ form.image }}
+        </div>
+        <span class="file-name" data-file-name></span>
+        <button type="button" class="add-location-btn icon-btn">
+          <svg class="icon" aria-hidden="true"><use href="#icon-map-pin"></use></svg> Location
+        </button>
+        <span hidden data-location-name-field>{{ form.location_name }}</span>
+      </div>
+      <button type="submit" class="btn btn-primary">Post</button>
+    </div>
+    <div class="location-status" style="font-size:0.8rem;color:var(--text-muted);margin-top:6px;"></div>
+  </form>
+</div>
+
+<div class="tabs">
+  <a href="?tab=following" class="{% if tab == 'following' %}active{% endif %}">Following</a>
+  <a href="?tab=recent" class="{% if tab == 'recent' %}active{% endif %}">Recent</a>
+</div>
+
+<div class="card">
+  {% for post in page_obj %}
+    {% include 'posts/partials/post_card.html' %}
+  {% empty %}
+    <div class="empty-state">
+      {% if tab == 'following' %}
+        <p>No posts from people you follow yet.</p>
+        <p><a class="link-accent" href="{% url 'social:explore' %}">Discover people to follow</a></p>
+      {% else %}
+        <p>No posts yet. Be the first to share something!</p>
+      {% endif %}
+    </div>
+  {% endfor %}
+</div>
+
+{% if page_obj.has_other_pages %}
+  <div style="display:flex; justify-content:center; gap:12px; margin-top:16px;">
+    {% if page_obj.has_previous %}<a class="btn btn-sm" href="?tab={{ tab }}&page={{ page_obj.previous_page_number }}">Previous</a>{% endif %}
+    {% if page_obj.has_next %}<a class="btn btn-sm" href="?tab={{ tab }}&page={{ page_obj.next_page_number }}">Next</a>{% endif %}
+  </div>
+{% endif %}
+{% endblock %}
+
+{% block sidebar %}
+<div class="card">
+  <h3>Suggested for you</h3>
+  {% for user in suggested_users %}
+    {% include 'social/partials/user_row.html' %}
+  {% empty %}
+    <p style="color:var(--text-muted); font-size:0.9rem;">No suggestions right now.</p>
+  {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,101 @@
+{% load static %}<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  {% if request.user.is_authenticated %}<meta name="csrf-token" content="{{ csrf_token }}">{% endif %}
+  <title>{% block title %}Nearby{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'css/base.css' %}">
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+  {% include 'partials/icons.html' %}
+  <header class="header">
+    <a class="brand" href="{% url 'posts:feed' %}">Nearby</a>
+    <form action="{% url 'social:search' %}" method="get" class="search-form">
+      <svg class="icon icon-sm search-icon" aria-hidden="true"><use href="#icon-search"></use></svg>
+      <input type="search" name="q" placeholder="Search people or posts" value="{{ request.GET.q }}">
+    </form>
+    <div class="header-actions">
+      {% if request.user.is_authenticated %}
+        <a class="btn btn-sm" href="{% url 'accounts:profile' request.user.username %}">{{ request.user.get_display_name }}</a>
+        <form method="post" action="{% url 'accounts:logout' %}">
+          {% csrf_token %}
+          <button class="btn btn-sm" type="submit">
+            <svg class="icon icon-sm" aria-hidden="true"><use href="#icon-log-out"></use></svg> Log out
+          </button>
+        </form>
+      {% else %}
+        <a class="btn btn-sm" href="{% url 'accounts:login' %}">
+          <svg class="icon icon-sm" aria-hidden="true"><use href="#icon-log-in"></use></svg> Log in
+        </a>
+        <a class="btn btn-primary btn-sm" href="{% url 'accounts:register' %}">Sign up</a>
+      {% endif %}
+    </div>
+  </header>
+
+  <div class="app-shell">
+    <nav class="sidebar">
+      <a href="{% url 'posts:feed' %}"><svg class="icon" aria-hidden="true"><use href="#icon-home"></use></svg> Home</a>
+      <a href="{% url 'social:explore' %}"><svg class="icon" aria-hidden="true"><use href="#icon-compass"></use></svg> Explore</a>
+      <a href="{% url 'geo:map' %}"><svg class="icon" aria-hidden="true"><use href="#icon-map"></use></svg> Map</a>
+      {% if request.user.is_authenticated %}
+        <a href="{% url 'social:notifications' %}" style="display:flex;">
+          <svg class="icon" aria-hidden="true"><use href="#icon-bell"></use></svg> Notifications
+          <span class="nav-badge" data-notif-badge {% if not unread_notifications_count %}hidden{% endif %}>{{ unread_notifications_count }}</span>
+        </a>
+        <a href="{% url 'messaging:inbox' %}" style="display:flex;">
+          <svg class="icon" aria-hidden="true"><use href="#icon-mail"></use></svg> Messages
+          <span class="nav-badge" data-msg-badge {% if not unread_messages_count %}hidden{% endif %}>{{ unread_messages_count }}</span>
+        </a>
+        <a href="{% url 'accounts:profile' request.user.username %}"><svg class="icon" aria-hidden="true"><use href="#icon-user"></use></svg> Profile</a>
+      {% endif %}
+    </nav>
+
+    <main>
+      {% if messages %}
+        <ul class="messages">
+          {% for message in messages %}<li>{{ message }}</li>{% endfor %}
+        </ul>
+      {% endif %}
+      {% block content %}{% endblock %}
+    </main>
+
+    <aside class="right-panel">
+      {% block sidebar %}
+      <div class="card">
+        <h3>About</h3>
+        <p style="color:var(--text-muted); font-size:0.9rem;">A small social network with a location-aware layer — see what's happening nearby.</p>
+      </div>
+      {% endblock %}
+    </aside>
+  </div>
+
+  <nav class="mobile-nav">
+    <a href="{% url 'posts:feed' %}"><svg class="icon" aria-hidden="true"><use href="#icon-home"></use></svg><span>Home</span></a>
+    <a href="{% url 'social:explore' %}"><svg class="icon" aria-hidden="true"><use href="#icon-compass"></use></svg><span>Explore</span></a>
+    <a href="{% url 'geo:map' %}"><svg class="icon" aria-hidden="true"><use href="#icon-map"></use></svg><span>Map</span></a>
+    {% if request.user.is_authenticated %}
+      <a href="{% url 'messaging:inbox' %}">
+        <svg class="icon" aria-hidden="true"><use href="#icon-mail"></use></svg><span>Messages</span>
+        <span class="nav-badge" data-msg-badge {% if not unread_messages_count %}hidden{% endif %}>{{ unread_messages_count }}</span>
+      </a>
+      <a href="{% url 'accounts:profile' request.user.username %}"><svg class="icon" aria-hidden="true"><use href="#icon-user"></use></svg><span>Profile</span></a>
+    {% else %}
+      <a href="{% url 'accounts:login' %}"><svg class="icon" aria-hidden="true"><use href="#icon-log-in"></use></svg><span>Log in</span></a>
+    {% endif %}
+  </nav>
+
+  <script src="{% static 'js/api.js' %}"></script>
+  <script src="{% static 'js/likes.js' %}"></script>
+  <script src="{% static 'js/follow.js' %}"></script>
+  <script src="{% static 'js/comments.js' %}"></script>
+  <script src="{% static 'js/composer.js' %}"></script>
+  <script src="{% static 'js/file-input.js' %}"></script>
+  <script src="{% static 'js/post-menu.js' %}"></script>
+  <script src="{% static 'js/save.js' %}"></script>
+  <script src="{% static 'js/block.js' %}"></script>
+  <script src="{% static 'js/notifications-poll.js' %}"></script>
+  {% block extra_scripts %}{% endblock %}
+</body>
+</html>
