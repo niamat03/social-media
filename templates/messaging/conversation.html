@@ -11,23 +11,49 @@
     <a href="{% url 'accounts:profile' other.username %}" style="font-weight:700; color:var(--text);">{{ other.get_display_name }}</a>
   </div>
 
-  <div class="message-list" data-username="{{ other.username }}" data-last-id="{{ conversation.last_message.id|default:0 }}" style="flex:1; overflow-y:auto; padding:14px 4px; display:flex; flex-direction:column; gap:8px;">
-    {% for message in messages_list %}
-      <div class="message-bubble {% if message.sender_id == request.user.id %}message-bubble-mine{% else %}message-bubble-theirs{% endif %}">
-        <p>{{ message.content }}</p>
-        <span class="message-time">{{ message.created_at|time:"H:i" }}</span>
+  {% if not conversation %}
+    <div class="empty-state" style="flex:1; display:flex; flex-direction:column; justify-content:center;">
+      {% if deny_reason == 'blocked' %}
+        <p>You can't message {{ other.get_display_name }}.</p>
+      {% elif deny_reason == 'nobody' %}
+        <p>{{ other.get_display_name }} isn't accepting messages right now.</p>
+      {% elif deny_reason == 'followers_only' %}
+        <p>{{ other.get_display_name }} only accepts messages from people they follow.</p>
+      {% else %}
+        <p>You can't message {{ other.get_display_name }} right now.</p>
+      {% endif %}
+    </div>
+  {% else %}
+    {% if is_request %}
+      <div class="report-form" style="margin:12px 0 0; flex-direction:row; align-items:center; justify-content:space-between;" data-username="{{ other.username }}">
+        <span style="font-size:0.88rem; color:var(--text-muted);">{{ other.get_display_name }} wants to send you messages.</span>
+        <div style="display:flex; gap:8px;">
+          <button type="button" class="btn btn-sm request-decline-btn" data-username="{{ other.username }}">Delete</button>
+          <button type="button" class="btn btn-sm btn-primary request-accept-btn" data-username="{{ other.username }}">Accept</button>
+        </div>
       </div>
-    {% empty %}
-      <p style="color:var(--text-muted); text-align:center; margin-top:40px;">Say hello to {{ other.get_display_name }}.</p>
-    {% endfor %}
-  </div>
+    {% elif not conversation.accepted %}
+      <p style="margin:10px 0 0; font-size:0.85rem; color:var(--text-muted);">Message request sent — {{ other.get_display_name }} hasn't accepted yet.</p>
+    {% endif %}
 
-  <form class="message-form" data-username="{{ other.username }}" style="display:flex; gap:8px; padding-top:12px; border-top:1px solid var(--border);">
-    <input type="text" name="content" placeholder="Write a message..." maxlength="2000" autocomplete="off" required>
-    <button type="submit" class="btn btn-primary" aria-label="Send message">
-      <svg class="icon icon-sm" aria-hidden="true"><use href="#icon-send"></use></svg>
-    </button>
-  </form>
+    <div class="message-list" data-username="{{ other.username }}" data-last-id="{{ conversation.last_message.id|default:0 }}" style="flex:1; overflow-y:auto; padding:14px 4px; display:flex; flex-direction:column; gap:8px;">
+      {% for message in messages_list %}
+        <div class="message-bubble {% if message.sender_id == request.user.id %}message-bubble-mine{% else %}message-bubble-theirs{% endif %}">
+          <p>{{ message.content }}</p>
+          <span class="message-time">{{ message.created_at|time:"H:i" }}</span>
+        </div>
+      {% empty %}
+        <p style="color:var(--text-muted); text-align:center; margin-top:40px;">Say hello to {{ other.get_display_name }}.</p>
+      {% endfor %}
+    </div>
+
+    <form class="message-form" data-username="{{ other.username }}" style="display:flex; gap:8px; padding-top:12px; border-top:1px solid var(--border);">
+      <input type="text" name="content" placeholder="Write a message..." maxlength="2000" autocomplete="off" required>
+      <button type="submit" class="btn btn-primary" aria-label="Send message">
+        <svg class="icon icon-sm" aria-hidden="true"><use href="#icon-send"></use></svg>
+      </button>
+    </form>
+  {% endif %}
 </div>
 {% endblock %}
 {% block extra_scripts %}

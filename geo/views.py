@@ -13,6 +13,8 @@ from django.urls import reverse
 
 from config.throttle import rate_limit
 from posts.models import Post
+from social.block_utils import blocked_user_ids_either_way
+from social.models import Follow
 
 MAX_RESULTS = 200
 DEFAULT_RADIUS_KM = 5
@@ -38,11 +40,20 @@ def nearby_posts_api(request):
 
     radius_km = min(max(radius_km, 0.1), settings.GEO_MAX_RADIUS_KM)
     user_point = Point(lng, lat, srid=4326)
+    scope = request.GET.get('scope', 'all')
 
     posts = (
         Post.objects.filter(location__isnull=False)
         .filter(location__distance_lte=(user_point, D(km=radius_km)))
-        .annotate(distance=Distance('location', user_point))
+        .exclude(author_id__in=blocked_user_ids_either_way(request.user))
+    )
+
+    if scope == 'following' and request.user.is_authenticated:
+        following_ids = Follow.objects.filter(follower=request.user).values_list('following_id', flat=True)
+        posts = posts.filter(author_id__in=following_ids)
+
+    posts = (
+        posts.annotate(distance=Distance('location', user_point))
         .select_related('author')
         .order_by('distance')[:MAX_RESULTS]
     )

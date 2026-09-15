@@ -4,6 +4,7 @@
 
   const statusEl = document.getElementById('map-status');
   const radiusSelect = document.getElementById('radius-select');
+  const scopeSelect = document.getElementById('scope-select');
 
   const map = L.map('map').setView([31.6295, -7.9811], 6); // Morocco-ish default center
   L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
@@ -34,14 +35,17 @@
   async function loadNearby(lat, lng) {
     currentCenter = { lat, lng };
     const radius = radiusSelect ? radiusSelect.value : 5;
+    const scope = scopeSelect ? scopeSelect.value : 'all';
     statusEl.textContent = 'Loading nearby posts...';
 
     try {
-      const data = await apiGet(`/geo/api/posts/nearby/?lat=${lat}&lng=${lng}&radius=${radius}`);
+      const data = await apiGet(`/geo/api/posts/nearby/?lat=${lat}&lng=${lng}&radius=${radius}&scope=${scope}`);
       markers.clearLayers();
 
       if (data.features.length === 0) {
-        statusEl.textContent = 'No posts nearby yet. Try expanding your search radius.';
+        statusEl.textContent = scope === 'following'
+          ? 'None of the people you follow have posted nearby. Try "Everyone" or a bigger radius.'
+          : 'No posts nearby yet. Try expanding your search radius.';
       } else {
         statusEl.textContent = `${data.features.length} post(s) found within ${radius} km.`;
       }
@@ -60,6 +64,12 @@
 
   if (radiusSelect) {
     radiusSelect.addEventListener('change', () => {
+      if (currentCenter) loadNearby(currentCenter.lat, currentCenter.lng);
+    });
+  }
+
+  if (scopeSelect) {
+    scopeSelect.addEventListener('change', () => {
       if (currentCenter) loadNearby(currentCenter.lat, currentCenter.lng);
     });
   }

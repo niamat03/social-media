@@ -3,6 +3,26 @@
 {% block title %}Messages · Nearby{% endblock %}
 {% block content %}
 <h2>Messages</h2>
+
+{% if request_rows %}
+  <div class="card" style="margin-bottom:16px;">
+    <h3 style="margin:0 0 8px;">Message requests <span class="nav-badge" style="margin-left:6px;">{{ request_rows|length }}</span></h3>
+    {% for row in request_rows %}
+      <a href="{% url 'messaging:conversation' row.other.username %}" class="user-row" style="text-decoration:none; {% if row.unread %}font-weight:600;{% endif %}">
+        <span class="avatar">
+          <img src="{{ row.other|avatar_url }}" class="avatar" alt="">
+        </span>
+        <div class="user-row-info">
+          <span class="display-name">{{ row.other.get_display_name }}</span>
+          <div class="username">
+            {% if row.last %}{{ row.last.content|truncatechars:50 }}{% else %}Wants to send you a message{% endif %}
+          </div>
+        </div>
+      </a>
+    {% endfor %}
+  </div>
+{% endif %}
+
 <div class="card">
   {% for row in rows %}
     <a href="{% url 'messaging:conversation' row.other.username %}" class="user-row" style="text-decoration:none; {% if row.unread %}font-weight:600;{% endif %}">

@@ -28,6 +28,28 @@ document.addEventListener('submit', async (event) => {
   }
 });
 
+document.addEventListener('click', async (event) => {
+  const acceptBtn = event.target.closest('.request-accept-btn');
+  const declineBtn = event.target.closest('.request-decline-btn');
+  const btn = acceptBtn || declineBtn;
+  if (!btn) return;
+
+  const username = btn.dataset.username;
+  const action = acceptBtn ? 'accept' : 'decline';
+
+  try {
+    await apiPost(`/messages/${username}/${action}/`);
+    if (action === 'decline') {
+      window.location.href = '/messages/';
+    } else {
+      const banner = btn.closest('.report-form');
+      if (banner) banner.remove();
+    }
+  } catch (err) {
+    console.error(err);
+  }
+});
+
 document.addEventListener('DOMContentLoaded', () => {
   const list = document.querySelector('.message-list');
   if (!list) return;

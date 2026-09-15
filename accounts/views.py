@@ -94,7 +94,23 @@ def settings_view(request):
     blocked_users = User.objects.filter(
         id__in=Block.objects.filter(blocker=request.user).values_list('blocked_id', flat=True)
     ).order_by('username')
-    return render(request, 'accounts/settings.html', {'blocked_users': blocked_users})
+    return render(request, 'accounts/settings.html', {
+        'blocked_users': blocked_users,
+        'dm_privacy_choices': User.DM_PRIVACY_CHOICES,
+    })
+
+
+@login_required
+def update_dm_privacy_view(request):
+    if request.method != 'POST':
+        return redirect('accounts:settings')
+
+    value = request.POST.get('dm_privacy')
+    if value in dict(User.DM_PRIVACY_CHOICES):
+        request.user.dm_privacy = value
+        request.user.save(update_fields=['dm_privacy'])
+
+    return redirect('accounts:settings')
 
 
 @login_required

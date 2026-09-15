@@ -10,4 +10,6 @@ urlpatterns = [
     path('<str:username>/', views.conversation_view, name='conversation'),
     path('<str:username>/send/', views.send_message_view, name='send'),
     path('<str:username>/poll/', views.poll_messages_view, name='poll'),
+    path('<str:username>/accept/', views.accept_request_view, name='accept'),
+    path('<str:username>/decline/', views.decline_request_view, name='decline'),
 ]

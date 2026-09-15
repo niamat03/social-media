@@ -27,6 +27,14 @@
       <option value="50">50 km</option>
     </select>
   </label>
+  {% if request.user.is_authenticated %}
+    <label>Show:
+      <select id="scope-select">
+        <option value="all" selected>Everyone</option>
+        <option value="following">People I follow</option>
+      </select>
+    </label>
+  {% endif %}
   <span id="map-status" style="color:var(--text-muted); font-size:0.9rem;">Click the map or use your location to search for posts nearby.</span>
 </div>
 <div id="map"></div>
@@ -34,5 +42,5 @@
 {% block extra_scripts %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.js"></script>
-<script src="{% static 'js/map.js' %}?v=4"></script>
+<script src="{% static 'js/map.js' %}?v=5"></script>
 {% endblock %}

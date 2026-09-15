@@ -27,6 +27,17 @@
     </form>
   </div>
 
+  <h3 style="margin-bottom:8px;">Messages</h3>
+  <form method="post" action="{% url 'accounts:update_dm_privacy' %}" style="margin-bottom:24px; display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+    {% csrf_token %}
+    <label for="dm_privacy" style="color:var(--text-muted); font-size:0.9rem;">Who can message you:</label>
+    <select name="dm_privacy" id="dm_privacy" onchange="this.form.submit()">
+      {% for value, label in dm_privacy_choices %}
+        <option value="{{ value }}" {% if request.user.dm_privacy == value %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+  </form>
+
   <h3 style="margin-bottom:8px;">Blocked accounts</h3>
   {% for blocked_user in blocked_users %}
     <div class="user-row blocked-user-row" data-username="{{ blocked_user.username }}">
