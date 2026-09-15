@@ -1,4 +1,4 @@
-{% load post_extras %}
+{% load post_extras account_extras %}
 <article class="post-card" id="post-{{ post.id }}" data-author-username="{{ post.author.username }}">
   <a href="{% url 'accounts:profile' post.author.username %}" class="avatar">
     <img src="{{ post.author|avatar_url }}" class="avatar" alt="">
@@ -33,6 +33,7 @@
               type="button"
               class="post-menu-item post-menu-danger block-toggle-btn"
               data-username="{{ post.author.username }}"
+              data-blocked="{% if post.author_is_blocked %}true{% else %}false{% endif %}"
             >
               <svg class="icon icon-sm" aria-hidden="true"><use href="#icon-block"></use></svg>
               <span class="block-toggle-label">{% if post.author_is_blocked %}Unblock{% else %}Block{% endif %} @{{ post.author.username }}</span>

@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% load account_extras %}
+{% block title %}Settings · Nearby{% endblock %}
+{% block content %}
+<div class="card">
+  <h2 style="margin-top:0;">Settings</h2>
+
+  <h3 style="margin-bottom:8px;">Account</h3>
+  <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:24px;">
+    <a href="{% url 'accounts:edit_profile' %}" class="btn btn-sm">
+      <svg class="icon icon-sm" aria-hidden="true"><use href="#icon-edit"></use></svg> Edit profile
+    </a>
+    <a href="{% url 'posts:saved' %}" class="btn btn-sm">
+      <svg class="icon icon-sm" aria-hidden="true"><use href="#icon-bookmark"></use></svg> Saved posts
+    </a>
+    <a href="{% url 'social:notifications' %}" class="btn btn-sm">
+      <svg class="icon icon-sm" aria-hidden="true"><use href="#icon-bell"></use></svg> Notifications
+    </a>
+    <a href="{% url 'messaging:inbox' %}" class="btn btn-sm">
+      <svg class="icon icon-sm" aria-hidden="true"><use href="#icon-mail"></use></svg> Messages
+    </a>
+    <form method="post" action="{% url 'accounts:logout' %}">
+      {% csrf_token %}
+      <button class="btn btn-sm" type="submit">
+        <svg class="icon icon-sm" aria-hidden="true"><use href="#icon-log-out"></use></svg> Log out
+      </button>
+    </form>
+  </div>
+
+  <h3 style="margin-bottom:8px;">Blocked accounts</h3>
+  {% for blocked_user in blocked_users %}
+    <div class="user-row blocked-user-row" data-username="{{ blocked_user.username }}">
+      <a href="{% url 'accounts:profile' blocked_user.username %}" class="avatar">
+        <img src="{{ blocked_user|avatar_url }}" class="avatar" alt="">
+      </a>
+      <div class="user-row-info">
+        <a href="{% url 'accounts:profile' blocked_user.username %}" class="display-name">{{ blocked_user.get_display_name }}</a>
+        <div class="username">@{{ blocked_user.username }}</div>
+      </div>
+      <button class="btn btn-sm btn-danger block-toggle-btn" data-username="{{ blocked_user.username }}" data-blocked="true">
+        <span class="block-toggle-label">Unblock</span>
+      </button>
+    </div>
+  {% empty %}
+    <div class="empty-state"><p>You haven't blocked anyone.</p></div>
+  {% endfor %}
+</div>
+{% endblock %}

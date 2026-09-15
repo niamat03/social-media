@@ -90,6 +90,14 @@ def following_view(request, username):
 
 
 @login_required
+def settings_view(request):
+    blocked_users = User.objects.filter(
+        id__in=Block.objects.filter(blocker=request.user).values_list('blocked_id', flat=True)
+    ).order_by('username')
+    return render(request, 'accounts/settings.html', {'blocked_users': blocked_users})
+
+
+@login_required
 def edit_profile_view(request):
     if request.method == 'POST':
         form = ProfileEditForm(request.POST, request.FILES, instance=request.user)

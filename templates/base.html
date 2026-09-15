@@ -49,6 +49,7 @@
           <span class="nav-badge" data-msg-badge {% if not unread_messages_count %}hidden{% endif %}>{{ unread_messages_count }}</span>
         </a>
         <a href="{% url 'accounts:profile' request.user.username %}"><svg class="icon" aria-hidden="true"><use href="#icon-user"></use></svg> Profile</a>
+        <a href="{% url 'accounts:settings' %}"><svg class="icon" aria-hidden="true"><use href="#icon-settings"></use></svg> Settings</a>
       {% endif %}
     </nav>
 
@@ -81,6 +82,7 @@
         <span class="nav-badge" data-msg-badge {% if not unread_messages_count %}hidden{% endif %}>{{ unread_messages_count }}</span>
       </a>
       <a href="{% url 'accounts:profile' request.user.username %}"><svg class="icon" aria-hidden="true"><use href="#icon-user"></use></svg><span>Profile</span></a>
+      <a href="{% url 'accounts:settings' %}"><svg class="icon" aria-hidden="true"><use href="#icon-settings"></use></svg><span>Settings</span></a>
     {% else %}
       <a href="{% url 'accounts:login' %}"><svg class="icon" aria-hidden="true"><use href="#icon-log-in"></use></svg><span>Log in</span></a>
     {% endif %}

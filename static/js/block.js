@@ -3,7 +3,11 @@ document.addEventListener('click', async (event) => {
   if (!btn) return;
 
   const username = btn.dataset.username;
-  if (!confirm(`Block @${username}? They won't be able to follow or message you, and you won't see each other's posts.`)) {
+  const currentlyBlocked = btn.dataset.blocked === 'true';
+  const confirmMessage = currentlyBlocked
+    ? `Unblock @${username}? They will be able to follow or message you again.`
+    : `Block @${username}? They won't be able to follow or message you, and you won't see each other's posts.`;
+  if (!confirm(confirmMessage)) {
     return;
   }
 
@@ -11,6 +15,7 @@ document.addEventListener('click', async (event) => {
     const data = await apiPost(`/social/users/${username}/block/`);
 
     document.querySelectorAll(`.block-toggle-btn[data-username="${username}"]`).forEach((b) => {
+      b.dataset.blocked = data.blocked ? 'true' : 'false';
       const label = b.querySelector('.block-toggle-label');
       if (label) {
         label.textContent = label.textContent.includes('@')
@@ -23,6 +28,8 @@ document.addEventListener('click', async (event) => {
 
     if (data.blocked) {
       document.querySelectorAll(`.post-card[data-author-username="${username}"]`).forEach((card) => card.remove());
+    } else {
+      document.querySelectorAll(`.blocked-user-row[data-username="${username}"]`).forEach((row) => row.remove());
     }
 
     document.querySelectorAll('.post-menu-dropdown').forEach((d) => { d.hidden = true; });
